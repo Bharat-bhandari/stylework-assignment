@@ -40,9 +40,10 @@ export const simulateLead = async (req: Request, res: Response) => {
   const rawBody = JSON.stringify(payload);
 
   // Posted back to this service so the demo runs through signature verification and the
-  // raw-body route rather than shortcutting into the database.
+  // raw-body route rather than shortcutting into the database. Addressed over loopback on the
+  // port this request arrived on, so it never leaves the process behind a proxy or TLS.
   const response = await fetch(
-    `${req.protocol}://${req.get('host') ?? `127.0.0.1:${env.PORT}`}/webhook/meta-lead`,
+    `http://127.0.0.1:${req.socket.localPort ?? env.PORT}/webhook/meta-lead`,
     {
       method: 'POST',
       headers: {

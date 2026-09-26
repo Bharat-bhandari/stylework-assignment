@@ -3,16 +3,13 @@ name: lead-intake
 services:
   db:
     image: postgres:16
-    container_name: lead-intake-db
     restart: unless-stopped
     environment:
-      # Local development credentials only. Deployment overrides these from the
-      # environment (see docker-compose.prod.yml).
       POSTGRES_USER: ${POSTGRES_USER:-lead_intake}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-lead_intake}
       POSTGRES_DB: ${POSTGRES_DB:-lead_intake}
-      # Second database on the same server, used by `npm test` so tests never
-      # touch development data. Created by the init script below.
+      # Second database on the same server, used by `npm test` so tests never touch
+      # development data. Created by the init script below.
       POSTGRES_TEST_DB: ${POSTGRES_TEST_DB:-lead_intake_test}
     ports:
       # 5435 on the host to avoid colliding with a local Postgres on 5432.
@@ -27,6 +24,37 @@ services:
       timeout: 5s
       retries: 12
       start_period: 10s
+
+  # api and web carry their own HEALTHCHECK in their Dockerfiles.
+  api:
+    build:
+      context: ./apps/api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-lead_intake}:${POSTGRES_PASSWORD:-lead_intake}@db:5432/${POSTGRES_DB:-lead_intake}?schema=public
+      META_APP_SECRET: ${META_APP_SECRET:?copy .env.example to .env and set META_APP_SECRET}
+      META_VERIFY_TOKEN: ${META_VERIFY_TOKEN:?copy .env.example to .env and set META_VERIFY_TOKEN}
+      META_ACCESS_TOKEN: ${META_ACCESS_TOKEN:-}
+      META_GRAPH_API_VERSION: ${META_GRAPH_API_VERSION:-v23.0}
+      LEAD_PROVIDER: ${LEAD_PROVIDER:-mock}
+      ENABLE_DEMO_TOOLS: ${ENABLE_DEMO_TOOLS:-true}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./apps/web
+    restart: unless-stopped
+    ports:
+      - '${WEB_PORT:-3000}:80'
+    depends_on:
+      api:
+        condition: service_healthy
 
 volumes:
   db-data:

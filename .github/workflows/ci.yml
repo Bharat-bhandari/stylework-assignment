@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  api:
+    name: api
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: lead_intake
+          POSTGRES_PASSWORD: lead_intake
+          POSTGRES_DB: lead_intake_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U lead_intake -d lead_intake_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    env:
+      DATABASE_URL: postgresql://lead_intake:lead_intake@localhost:5432/lead_intake_test?schema=public
+      TEST_DATABASE_URL: postgresql://lead_intake:lead_intake@localhost:5432/lead_intake_test?schema=public
+      META_APP_SECRET: ci-app-secret
+      META_VERIFY_TOKEN: ci-verify-token
+
+    defaults:
+      run:
+        working-directory: apps/api
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: apps/api/package-lock.json
+
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npx prisma migrate deploy
+      - run: npm run check
+
+  web:
+    name: web
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/web
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build

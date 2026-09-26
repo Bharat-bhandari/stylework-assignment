@@ -13,7 +13,9 @@ export const buildApp = (): Express => {
   const app = express();
 
   app.disable('x-powered-by');
-  app.set('trust proxy', true);
+  // Two hops in deployment (host nginx, then the web container's nginx). A count rather than
+  // `true` so a client cannot forge its own address by sending X-Forwarded-For.
+  app.set('trust proxy', 2);
 
   app.use(httpLogger);
   app.use(helmet());

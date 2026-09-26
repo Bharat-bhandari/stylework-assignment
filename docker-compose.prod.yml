@@ -1,0 +1,27 @@
+# Deployment override. Use it alongside the base file:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+name: lead-intake
+
+services:
+  db:
+    container_name: lead_intake_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set a strong POSTGRES_PASSWORD in .env}
+    # Nothing on the host talks to Postgres; api reaches it over the compose network.
+    ports: !reset []
+
+  # No published ports: the only way in is the web container's /api proxy.
+  api:
+    container_name: lead_intake_api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-lead_intake}:${POSTGRES_PASSWORD:?set a strong POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-lead_intake}?schema=public
+
+  web:
+    container_name: lead_intake_web
+    restart: unless-stopped
+    # Loopback only: host nginx terminates TLS and proxies here, so the container port is
+    # never reachable from the internet.
+    ports: !override
+      - '127.0.0.1:3010:80'
