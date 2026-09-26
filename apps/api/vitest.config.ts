@@ -12,6 +12,10 @@ export default defineConfig({
       NODE_ENV: 'test',
       LOG_LEVEL: 'silent',
       DATABASE_URL: process.env['TEST_DATABASE_URL'] ?? process.env['DATABASE_URL'] ?? '',
+      META_APP_SECRET: process.env['META_APP_SECRET'] ?? 'test-app-secret',
+      META_VERIFY_TOKEN: process.env['META_VERIFY_TOKEN'] ?? 'test-verify-token',
+      LEAD_PROVIDER: 'mock',
+      ENABLE_DEMO_TOOLS: 'true',
     },
     // Tests share one database, so files must not race each other.
     fileParallelism: false,

@@ -1,9 +1,11 @@
 import { buildApp } from './app.js';
 import { disconnectDatabase } from './config/db.js';
 import { env } from './config/env.js';
+import { sweepPendingWebhookEvents } from './service/webhookEvent.service.js';
 import { logger } from './utils/logger.js';
 
 const SHUTDOWN_TIMEOUT_MS = 10_000;
+const RETRY_SWEEP_INTERVAL_MS = 30_000;
 
 const app = buildApp();
 
@@ -13,6 +15,13 @@ const server = app.listen(env.PORT, () => {
     'API listening',
   );
 });
+
+const retrySweeper = setInterval(() => {
+  void sweepPendingWebhookEvents().catch((error: unknown) => {
+    logger.error({ err: error }, 'Webhook retry sweep failed');
+  });
+}, RETRY_SWEEP_INTERVAL_MS);
+retrySweeper.unref();
 
 let shuttingDown = false;
 
@@ -29,6 +38,8 @@ const shutdown = async (reason: string, exitCode = 0): Promise<void> => {
   shuttingDown = true;
 
   logger.info({ reason }, 'Shutting down');
+
+  clearInterval(retrySweeper);
 
   const forceExit = setTimeout(() => {
     logger.error({ reason }, 'Graceful shutdown timed out, exiting');

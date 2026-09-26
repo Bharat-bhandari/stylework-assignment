@@ -16,7 +16,8 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:migrate:test": "tsx scripts/migrate-test-db.ts",
     "db:generate": "prisma generate",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "webhook:test": "tsx scripts/send-test-webhook.ts"
   },
   "license": "UNLICENSED",
   "type": "module",
