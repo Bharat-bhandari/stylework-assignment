@@ -5,6 +5,7 @@ import { env } from './config/env.js';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware.js';
 import devRoute from './routes/dev.route.js';
 import healthRoute from './routes/health.route.js';
+import leadRoute from './routes/lead.route.js';
 import metaWebhookRoute from './routes/metaWebhook.route.js';
 import { httpLogger } from './utils/logger.js';
 
@@ -28,6 +29,7 @@ export const buildApp = (): Express => {
   app.use(express.json({ limit: '1mb' }));
 
   app.use('/health', healthRoute);
+  app.use('/leads', leadRoute);
 
   if (env.ENABLE_DEMO_TOOLS) {
     app.use('/dev', devRoute);
