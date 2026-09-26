@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  LOST
+}
+
+enum ActivityType {
+  LEAD_CREATED
+  LEAD_UPDATED
+  STATUS_CHANGED
+}
+
+enum WebhookSource {
+  META
+}
+
+enum WebhookEventStatus {
+  RECEIVED
+  PROCESSING
+  PROCESSED
+  FAILED
+}
+
+model Lead {
+  id String @id @default(uuid()) @db.Uuid
+
+  metaLeadId String @unique
+
+  pageId String
+  formId String
+
+  adId       String?
+  campaignId String?
+  platform   String?
+
+  fullName String?
+  email    String?
+  phone    String?
+
+  answers Json
+  rawData Json
+
+  isTest Boolean @default(false)
+
+  status LeadStatus @default(NEW)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  activities LeadActivity[]
+
+  @@index([status, createdAt])
+}
+
+model LeadActivity {
+  id String @id @default(uuid()) @db.Uuid
+
+  leadId String @db.Uuid
+  lead   Lead   @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  type  ActivityType
+  actor String
+
+  fromStatus LeadStatus?
+  toStatus   LeadStatus?
+
+  changes Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([leadId, createdAt])
+}
+
+model WebhookEvent {
+  id String @id @default(uuid()) @db.Uuid
+
+  source WebhookSource @default(META)
+
+  // Not unique: a redelivery is a real second delivery. Idempotency lives on Lead.metaLeadId.
+  externalId String
+
+  payload Json
+
+  status   WebhookEventStatus @default(RECEIVED)
+  attempts Int                @default(0)
+
+  lastError String?
+
+  receivedAt  DateTime  @default(now())
+  processedAt DateTime?
+
+  @@index([status, receivedAt])
+}
