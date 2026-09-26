@@ -1,0 +1,47 @@
+{
+  "name": "@lead-intake/web",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "check": "npm run typecheck && npm run lint && npm run test"
+  },
+  "license": "UNLICENSED",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.2",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@tailwindcss/vite": "^4.1.14",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.1",
+    "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^6.1.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "jsdom": "^27.0.0",
+    "tailwindcss": "^4.1.14",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.70.1",
+    "vite": "^7.1.9",
+    "vitest": "^3.2.7"
+  }
+}

@@ -1,0 +1,189 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  --color-paper: #f8f7f4;
+  --color-panel: #ffffff;
+  --color-sunk: #f2f1ed;
+  --color-line: #e5e3dd;
+  --color-line-strong: #d4d1c9;
+
+  --color-ink: #17181b;
+  --color-ink-hover: #2c2e33;
+  --color-ink-press: #0c0d0f;
+  --color-ink-muted: #5f6369;
+  --color-ink-soft: #85898f;
+  --color-ink-invert: #f6f5f2;
+  --color-ink-invert-muted: #a7a9ad;
+
+  --color-signal-positive: #79d3a4;
+  --color-signal-negative: #f08b80;
+
+  --color-lead-new: #2f6fcb;
+  --color-lead-new-soft: #e9f0fa;
+  --color-lead-new-ink: #1a4a8e;
+
+  --color-lead-contacted: #c07b12;
+  --color-lead-contacted-soft: #fbf1dc;
+  --color-lead-contacted-ink: #7a4a06;
+
+  --color-lead-qualified: #7b54ce;
+  --color-lead-qualified-soft: #f0ebfb;
+  --color-lead-qualified-ink: #543090;
+
+  --color-lead-converted: #2e8659;
+  --color-lead-converted-soft: #e4f1ea;
+  --color-lead-converted-ink: #17593a;
+
+  --color-lead-lost: #c0483f;
+  --color-lead-lost-soft: #f9e9e7;
+  --color-lead-lost-ink: #8a2a2a;
+
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.0625rem;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 0.875rem;
+  --text-base--line-height: 1.375rem;
+  --text-md: 0.9375rem;
+  --text-md--line-height: 1.4375rem;
+  --text-lg: 1.0625rem;
+  --text-lg--line-height: 1.5rem;
+  --text-xl: 1.3125rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.625rem;
+  --text-2xl--line-height: 2rem;
+
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 9px;
+
+  --shadow-panel: 0 1px 2px rgb(23 24 27 / 0.05), 0 1px 1px rgb(23 24 27 / 0.03);
+  --shadow-pop: 0 10px 28px -8px rgb(23 24 27 / 0.18), 0 3px 8px -3px rgb(23 24 27 / 0.08);
+
+  --animate-flash-in: flash-in 2.6s ease-out;
+  --animate-rise-in: rise-in 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-sweep: sweep 1.4s ease-in-out infinite;
+}
+
+@keyframes flash-in {
+  from {
+    background-color: #fbf1dc;
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sweep {
+  0% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.55;
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    accent-color: var(--color-ink);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--color-ink);
+    color: var(--color-ink-invert);
+  }
+
+  input,
+  textarea,
+  select {
+    caret-color: var(--color-ink);
+    font: inherit;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-ink-muted);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  /* The ink chrome would swallow an ink focus ring. */
+  .on-ink :focus-visible {
+    outline-color: var(--color-ink-invert);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 11px;
+    height: 11px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-line-strong);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-ink-soft);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
